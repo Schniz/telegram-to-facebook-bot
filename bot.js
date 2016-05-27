@@ -41,7 +41,7 @@ const toFullstack$ = messages$.filter(({ text }) => text.match(/\#fullstack/i));
 const urls$ = toFullstack$.map(convertMessage);
 
 urls$.subscribe(console.log);
-urls$.subscribe(sendMail);
+urls$.filter(e => e.urls.length).subscribe(sendMail);
 
 const api = new BotApi({
 	token: process.env.BOT_TOKEN,

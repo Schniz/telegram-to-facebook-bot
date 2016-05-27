@@ -37,8 +37,8 @@ const convertMessage = message => ({
 });
 
 const messages$ = new Subject();
-messagesWithReplies$.subscribe(console.log, 'got message');
-const toFullstack$ = messagesWithReplies$.filter(({ text }) => text.match(/\#fullstack/i));
+messages$.subscribe(console.log, 'got message');
+const toFullstack$ = messages$.filter(({ text }) => text.match(/\#fullstack/i));
 const withReplies$ = toFullstack$.map(maybeTakeReply);
 const urls$ = withReplies$.map(convertMessage);
 

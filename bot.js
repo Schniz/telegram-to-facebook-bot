@@ -29,12 +29,10 @@ function sendMail({ user, urls }) {
 	});
 };
 
-const convertMessage = message => {
-	return {
-		urls: getUrls(message.text),
-		user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`,
-	};
-};
+const convertMessage = message => ({
+	urls: getUrls(message.text),
+	user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`,
+});
 
 const messages$ = new Subject();
 messages$.subscribe(console.log);

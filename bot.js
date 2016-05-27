@@ -15,8 +15,8 @@ function sendMail(url) {
 	var mailOptions = {
 			from: '"Joe Hagever" <joe.hagever@gmail.com>', // sender address
 			to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
-			subject: 'https://github.com', // Subject line
-			text: 'have fun', // plaintext body
+			subject: 'a new message', // Subject line
+			text: url, // plaintext body
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){
@@ -34,6 +34,8 @@ const messages$ = new Subject();
 const toFullstack$ = messages$.filter(({ text }) => text.match(/\#fullstack/i));
 const texts$ = toFullstack$.pluck('text');
 const urls$ = texts$.flatMap(getUrls);
+
+urls$.subscribe(sendMail);
 
 const api = new BotApi({
 	token: process.env.BOT_TOKEN,

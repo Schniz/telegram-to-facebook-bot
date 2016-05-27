@@ -37,10 +37,10 @@ const convertMessage = message => ({
 });
 
 const messages$ = new Subject();
-const messagesWithReplies$ = messages$.map(maybeTakeReply);
 messagesWithReplies$.subscribe(console.log, 'got message');
 const toFullstack$ = messagesWithReplies$.filter(({ text }) => text.match(/\#fullstack/i));
-const urls$ = toFullstack$.map(convertMessage);
+const withReplies$ = toFullstack$.map(maybeTakeReply);
+const urls$ = withReplies$.map(convertMessage);
 
 urls$.subscribe(console.log);
 urls$.filter(e => e.urls.length).subscribe(sendMail);

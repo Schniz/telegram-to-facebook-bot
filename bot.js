@@ -7,10 +7,18 @@ const {
 	FROM_ADDR,
 	BOT_TOKEN,
 	SMTP_SERVER,
-	FB_GROUP
+	FB_GROUP,
+	HOTMAIL_USER,
+	HOTMAIL_PASS,
 } = process.env;
 
-var transporter = nodemailer.createTransport(SMTP_SERVER);
+var transporter = nodemailer.createTransport(SMTP_SERVER || {
+	service: "hotmail",
+	auth: {
+		user: HOTMAIL_USER,
+		pass: HOTMAIL_PASS,
+	},
+});
 
 function sendMail({ user, urls }) {
 	var mailOptions = {

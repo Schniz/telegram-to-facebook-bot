@@ -29,14 +29,17 @@ function sendMail({ user, urls }) {
 	});
 };
 
+const maybeTakeReply = message => message.reply_to_message ? message.reply_to_message : message;
+
 const convertMessage = message => ({
 	urls: getUrls(message.text),
 	user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`,
 });
 
 const messages$ = new Subject();
-messages$.subscribe(console.log);
-const toFullstack$ = messages$.filter(({ text }) => text.match(/\#fullstack/i));
+const messagesWithReplies$ = messages$.map(maybeTakeReply);
+messagesWithReplies$.subscribe(console.log, 'got message');
+const toFullstack$ = messagesWithReplies$.filter(({ text }) => text.match(/\#fullstack/i));
 const urls$ = toFullstack$.map(convertMessage);
 
 urls$.subscribe(console.log);

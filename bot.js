@@ -11,12 +11,12 @@ const {
 
 var transporter = nodemailer.createTransport(SMTP_SERVER);
 
-function sendMail(url) {
+function sendMail({ user, urls }) {
 	var mailOptions = {
 			from: '"Joe Hagever" <joe.hagever@gmail.com>', // sender address
 			to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
-			subject: 'a new message', // Subject line
-			text: url, // plaintext body
+			subject: `a new message from ${user}`, // Subject line
+			text: urls.join('\n'), // plaintext body
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){
@@ -26,15 +26,21 @@ function sendMail(url) {
 			console.log('message info', info);
 			console.log('sent to', mailOptions);
 	});
-}
+};
 
+const convertMessage = message => {
+	return {
+		urls: getUrls(message.text),
+		user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`
+	};
+};
 
-const head = arr => arr[0];
 const messages$ = new Subject();
+messages$.subscribe(console.log);
 const toFullstack$ = messages$.filter(({ text }) => text.match(/\#fullstack/i));
-const texts$ = toFullstack$.pluck('text');
-const urls$ = texts$.flatMap(getUrls);
+const urls$ = toFullstack$.map(convertMessage);
 
+urls$.subscribe(console.log);
 urls$.subscribe(sendMail);
 
 const api = new BotApi({

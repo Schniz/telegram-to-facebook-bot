@@ -11,19 +11,23 @@ const {
 
 var transporter = nodemailer.createTransport(SMTP_SERVER);
 
-var mailOptions = {
-    from: '"Joe Hagever" <joe.hagever@gmail.com>', // sender address
-    to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
-		subject: 'https://github.com', // Subject line
-    text: 'have fun', // plaintext body
-};
+function sendMail(url) {
+	var mailOptions = {
+			from: '"Joe Hagever" <joe.hagever@gmail.com>', // sender address
+			to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
+			subject: 'https://github.com', // Subject line
+			text: 'have fun', // plaintext body
+	};
 
-transporter.sendMail(mailOptions, function(error, info){
-    if(error){
-        return console.log(error);
-    }
-    console.log('Message sent: ' + info.response);
-});
+	transporter.sendMail(mailOptions, function(error, info){
+			if(error){
+					return console.log(error);
+			}
+			console.log('message info', info);
+			console.log('sent to', mailOptions);
+	});
+}
+
 
 const head = arr => arr[0];
 const messages$ = new Subject();

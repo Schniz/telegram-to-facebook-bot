@@ -4,6 +4,7 @@ import { Subject } from 'rx';
 import nodemailer from 'nodemailer';
 
 const {
+	FROM_ADDR,
 	BOT_TOKEN,
 	SMTP_SERVER,
 	FB_GROUP
@@ -13,7 +14,7 @@ var transporter = nodemailer.createTransport(SMTP_SERVER);
 
 function sendMail({ user, urls }) {
 	var mailOptions = {
-			from: '"Joe Hagever" <joe.hagever@gmail.com>', // sender address
+			from: FROM_ADDR, // sender address
 			to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
 			subject: `a new message from ${user}`, // Subject line
 			text: urls.join('\n'), // plaintext body
@@ -31,7 +32,7 @@ function sendMail({ user, urls }) {
 const convertMessage = message => {
 	return {
 		urls: getUrls(message.text),
-		user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`
+		user: `${message.from.first_name} ${message.from.last_name} (@${message.from.username})`,
 	};
 };
 

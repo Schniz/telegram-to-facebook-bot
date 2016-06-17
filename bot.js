@@ -2,40 +2,44 @@ import BotApi from 'telegram-bot-api';
 import getUrls from 'get-urls';
 import { Subject } from 'rx';
 import nodemailer from 'nodemailer';
+import fetch from 'node-fetch';
+import jwt from 'jsonwebtoken';
 
 const {
-	FROM_ADDR,
 	BOT_TOKEN,
-	SMTP_SERVER,
 	FB_GROUP,
-	HOTMAIL_USER,
-	HOTMAIL_PASS,
+	LOGINNER_URL,
+	SECRET,
 } = process.env;
 
-var transporter = nodemailer.createTransport(SMTP_SERVER || {
-	service: "hotmail",
-	auth: {
-		user: HOTMAIL_USER,
-		pass: HOTMAIL_PASS,
-	},
-});
-
-function sendMail({ user, urls }) {
-	var mailOptions = {
-			from: FROM_ADDR, // sender address
-			to: `${FB_GROUP}@groups.facebook.com`, // list of receivers
-			subject: `a new message from ${user}`, // Subject line
-			text: urls.join('\n'), // plaintext body
+function createJsonFromMessage(text) {
+	return {
+		signed: jwt.sign({
+			text,
+			groupId: FB_GROUP,
+		}, SECRET),
 	};
+}
 
-	transporter.sendMail(mailOptions, function(error, info){
-			if(error){
-					return console.log(error);
-			}
-			console.log('message info', info);
-			console.log('sent to', mailOptions);
+function sendJsonToLoginner(json) {
+	console.log(json);
+
+	return fetch(LOGINNER_URL, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(json),
+	}).then(e => e.json()).then(e => {
+		console.log('response:', e)
+	}).catch(err => {
+		console.log('an error occured!', err);
 	});
-};
+}
+
+function toMessage({ user, urls }) {
+	return [`a new message from ${user}:`].concat(urls).join('\n');
+}
 
 const maybeTakeReply = message => message.reply_to_message ? message.reply_to_message : message;
 
@@ -51,7 +55,7 @@ const withReplies$ = toFullstack$.map(maybeTakeReply);
 const urls$ = withReplies$.map(convertMessage);
 
 urls$.subscribe(console.log);
-urls$.filter(e => e.urls.length).subscribe(sendMail);
+urls$.filter(e => e.urls.length).map(toMessage).map(createJsonFromMessage).subscribe(sendJsonToLoginner);
 
 const api = new BotApi({
 	token: process.env.BOT_TOKEN,

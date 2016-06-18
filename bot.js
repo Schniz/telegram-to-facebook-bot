@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 const {
 	BOT_TOKEN,
 	FB_GROUP,
-	LOGINNER_URL,
+	FB_POSTER_URL,
 	SECRET,
 } = process.env;
 
@@ -24,7 +24,7 @@ function createJsonFromMessage(text) {
 function sendJsonToLoginner(json) {
 	console.log(json);
 
-	return fetch(LOGINNER_URL, {
+	return fetch(FB_POSTER_URL, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ urls$.subscribe(console.log);
 urls$.filter(e => e.urls.length).map(toMessage).map(createJsonFromMessage).subscribe(sendJsonToLoginner);
 
 const api = new BotApi({
-	token: process.env.BOT_TOKEN,
+	token: BOT_TOKEN,
 	updates: {
 		enabled: true,
 	},
